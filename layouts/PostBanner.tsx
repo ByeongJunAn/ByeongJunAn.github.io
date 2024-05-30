@@ -9,7 +9,7 @@ import PageTitle from '@/components/PageTitle'
 import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
-
+import { SpeedInsights } from '@vercel/speed-insights/next'
 interface LayoutProps {
   content: CoreContent<Blog>
   children: ReactNode
@@ -23,6 +23,8 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
     images && images.length > 0 ? images[0] : 'https://picsum.photos/seed/picsum/800/400'
 
   return (
+    <>
+    <SpeedInsights/>
     <SectionContainer>
       <ScrollTopAndComment />
       <article>
@@ -74,5 +76,6 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
         </div>
       </article>
     </SectionContainer>
+    </>
   )
 }

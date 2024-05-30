@@ -8,7 +8,7 @@ import type { Blog } from 'contentlayer/generated'
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
-
+import { SpeedInsights } from '@vercel/speed-insights/next'
 interface PaginationProps {
   totalPages: number
   currentPage: number
@@ -26,7 +26,8 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
   const prevPage = currentPage - 1 > 0
   const nextPage = currentPage + 1 <= totalPages
 
-  return (
+  return (<>
+    <SpeedInsights/>
     <div className="space-y-2 pb-8 pt-6 md:space-y-5">
       <nav className="flex justify-between">
         {!prevPage && (
@@ -57,6 +58,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
         )}
       </nav>
     </div>
+    </>
   )
 }
 

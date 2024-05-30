@@ -8,7 +8,7 @@ import PageTitle from '@/components/PageTitle'
 import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
-
+import { SpeedInsights } from '@vercel/speed-insights/next'
 interface LayoutProps {
   content: CoreContent<Blog>
   children: ReactNode
@@ -20,7 +20,9 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
   const { path, slug, date, title } = content
 
   return (
-    <SectionContainer>
+    <>
+      <SpeedInsights/>
+      <SectionContainer>
       <ScrollTopAndComment />
       <article>
         <div>
@@ -78,5 +80,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
         </div>
       </article>
     </SectionContainer>
+    </>
+    
   )
 }
