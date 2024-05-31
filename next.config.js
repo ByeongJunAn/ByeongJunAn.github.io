@@ -81,7 +81,7 @@ module.exports = () => {
             ...securityHeaders,
             {
               key: 'naver-site-verification',
-              value: "063efcfeb5cb22929431a668a3dbf7baa5cb5a3a",
+              value: '063efcfeb5cb22929431a668a3dbf7baa5cb5a3a',
             },
           ],
         },
