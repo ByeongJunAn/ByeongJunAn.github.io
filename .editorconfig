@@ -1,0 +1,5 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# 모든 MDX 파일에 대해 LF 형식을 강제
+[*.mdx]
+end_of_line = lf

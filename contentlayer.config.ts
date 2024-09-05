@@ -173,7 +173,11 @@ export default makeSource({
     ],
   },
   onSuccess: async (importData) => {
+    
     const { allBlogs } = await importData()
+    allBlogs.forEach((file, index) => {
+      console.log(`Blog ${index + 1}: ${file.title}, Tags: ${file.tags}`);
+    });
     createTagCount(allBlogs)
     createSearchIndex(allBlogs)
   },

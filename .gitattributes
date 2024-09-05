@@ -34,6 +34,7 @@
 *.less            text
 *.ls              text
 *.map             text -diff
+*.mdx             text eol=lf
 *.od              text
 *.onlydata        text
 *.php             text diff=php
