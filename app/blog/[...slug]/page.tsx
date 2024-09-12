@@ -14,6 +14,9 @@ import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { notFound } from 'next/navigation'
 
+// import { getTableOfContents } from '../../../lib/toc'
+// import TableOfContents from '../../../components/TableOfContents'
+
 const defaultLayout = 'PostLayout'
 const layouts = {
   PostSimple,
@@ -98,6 +101,9 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
     return coreContent(authorResults as Authors)
   })
   const mainContent = coreContent(post)
+  console.log(`${mainContent} --------------------------`)
+  // const toc = getTableOfContents(mainContent.content)
+
   const jsonLd = post.structuredData
   jsonLd['author'] = authorDetails.map((author) => {
     return {
@@ -115,6 +121,7 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Layout content={mainContent} authorDetails={authorDetails} next={next} prev={prev}>
+        {/* <TableOfContents headings={toc} /> */}
         <MDXLayoutRenderer code={post.body.code} components={components} toc={post.toc} />
       </Layout>
     </>
