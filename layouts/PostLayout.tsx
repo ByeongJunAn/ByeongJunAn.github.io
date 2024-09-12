@@ -1,4 +1,6 @@
-import { ReactNode } from 'react'
+'use client'
+
+import React, { ReactNode } from 'react'
 import { CoreContent } from 'pliny/utils/contentlayer'
 import type { Blog, Authors } from 'contentlayer/generated'
 import Comments from '@/components/Comments'
@@ -10,6 +12,8 @@ import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import TableOfContents from '@/components/TableOfContents'
+
 const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
 const discussUrl = (path) =>
   `https://mobile.twitter.com/search?q=${encodeURIComponent(`${siteMetadata.siteUrl}/${path}`)}`
@@ -30,7 +34,7 @@ interface LayoutProps {
 }
 
 export default function PostLayout({ content, authorDetails, next, prev, children }: LayoutProps) {
-  const { filePath, path, slug, date, title, tags } = content
+  const { filePath, path, slug, date, title, tags, toc } = content
   const basePath = path.split('/')[0]
 
   return (
@@ -96,6 +100,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                 </dd>
               </dl>
               <div className="divide-y divide-gray-200 dark:divide-gray-700 xl:col-span-3 xl:row-span-2 xl:pb-0">
+                <TableOfContents headings={toc} />
                 <div className="prose max-w-none pb-8 pt-10 dark:prose-invert">{children}</div>
                 <div className="pb-6 pt-6 text-sm text-gray-700 dark:text-gray-300">
                   <Link href={discussUrl(path)} rel="nofollow">

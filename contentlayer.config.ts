@@ -11,7 +11,6 @@ import {
   remarkExtractFrontmatter,
   remarkCodeTitles,
   remarkImgToJsx,
-  extractTocHeadings,
 } from 'pliny/mdx-plugins/index.js'
 // Rehype packages
 import rehypeSlug from 'rehype-slug'
@@ -53,7 +52,46 @@ const computedFields: ComputedFields = {
     type: 'string',
     resolve: (doc) => doc._raw.sourceFilePath,
   },
-  toc: { type: 'string', resolve: (doc) => extractTocHeadings(doc.body.raw) },
+  toc: {
+    type: 'json',
+    resolve: (doc) => {
+      const regex = /^(#{1,6})\s+(.*)/gm
+      const headings: { id: string; title: string; level: number; parentId: string | null }[] = []
+      const idSet = new Set()
+      let match
+      const parentStack: { id: string; level: number }[] = []
+
+      while ((match = regex.exec(doc.body.raw)) !== null) {
+        const cleanTitle = match[2].replace(/<[^>]*>/g, '')
+        let id = cleanTitle
+          .toLowerCase()
+          .replace(/[^\w\s가-힣-]/g, '')
+          .replace(/\s+/g, '-')
+        const level = match[1].length // 제목의 레벨 추출
+
+        // 중복된 id가 있는지 확인
+        if (idSet.has(id)) {
+          let count = 1
+          while (idSet.has(`${id}-${count}`)) {
+            count++
+          }
+          id = `${id}-${count}`
+        }
+
+        idSet.add(id)
+
+        // 부모 ID 설정
+        while (parentStack.length > 0 && parentStack[parentStack.length - 1].level >= level) {
+          parentStack.pop()
+        }
+        const parentId = parentStack.length > 0 ? parentStack[parentStack.length - 1].id : null
+
+        headings.push({ id, title: cleanTitle, level, parentId })
+        parentStack.push({ id, level })
+      }
+      return headings
+    },
+  },
 }
 
 /**
@@ -173,11 +211,10 @@ export default makeSource({
     ],
   },
   onSuccess: async (importData) => {
-    
     const { allBlogs } = await importData()
     allBlogs.forEach((file, index) => {
-      console.log(`Blog ${index + 1}: ${file.title}, Tags: ${file.tags}`);
-    });
+      console.log(`Blog ${index + 1}: ${file.title}, Tags: ${file.tags}`)
+    })
     createTagCount(allBlogs)
     createSearchIndex(allBlogs)
   },

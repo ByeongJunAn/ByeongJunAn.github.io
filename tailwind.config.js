@@ -27,6 +27,9 @@ module.exports = {
       colors: {
         primary: colors.pink,
         gray: colors.gray,
+        h1: '#FF9999',
+        h2: '#A3E4A3',
+        qa: '#4682B4',
       },
       typography: ({ theme }) => ({
         DEFAULT: {
