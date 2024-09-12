@@ -73,12 +73,29 @@ module.exports = () => {
         },
       ],
     },
+    crossOrigin: 'anonymous', // 또는 'use-credentials' anonymous: 자격 증명 없이 요청
     async headers() {
       return [
         {
           source: '/(.*)',
           headers: [
             ...securityHeaders,
+            {
+              key: 'Access-Control-Allow-Origin',
+              value: '*', // 필요한 도메인으로 변경 가능
+            },
+            {
+              key: 'Access-Control-Allow-Methods',
+              value: 'GET, POST, PUT, DELETE, OPTIONS',
+            },
+            {
+              key: 'Access-Control-Allow-Headers',
+              value: 'X-Requested-With, Content-Type, Authorization',
+            },
+            {
+              key: 'Access-Control-Allow-Credentials',
+              value: 'true',
+            },
             {
               key: 'naver-site-verification',
               value: '063efcfeb5cb22929431a668a3dbf7baa5cb5a3a',
