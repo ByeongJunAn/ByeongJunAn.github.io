@@ -1,6 +1,6 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Next.js Starter Blog',
+  title: 'ByeongJun An Blog',
   author: 'ByeongJun An',
   headerTitle: 'Bang',
   description: '프론트엔드 개발자가 꿈입니다!',
