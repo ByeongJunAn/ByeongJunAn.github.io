@@ -15,7 +15,7 @@ summary: |
 
 내부 슬롯과 내부 메서드는 자바스크립트 엔진의 내부 로직이며 ECMAScript 사양에 등장하는 이중 대괄호([[...]])로 감싼 이름을 말한다.
 이 내부 슬롯과 내부 메서드에 직접 접근이나 호출할 수는 없고 일부 슬롯과 메서드에 한하여 간접적으로 접근할 수 있는 수단을 제공한다.
-예를 들어 모든 객체는 **[[Prototype]]** 이라는 내부 슬롯을 갖는데 직접 접근은 불가능 하지만 `__proto__` 를 통해 간접적으로 접근 할 수 있다.
+예를 들어 모든 객체는 **[[Prototype]]** 이라는 내부 슬롯을 갖는데 직접 접근은 불가능 하지만 \_\_proto\_\_ 를 통해 간접적으로 접근 할 수 있다.
 
 ## <span className="text-h2">프로퍼티 어트리뷰트와 프로퍼티 디스크립터 객체</span>
 
@@ -43,7 +43,7 @@ console.log(Object.getOwnPropertyDescriptor(person, 'name'))
 - 데이터 프로퍼티 : 키와 값으로 구성된 일반적인 프로퍼티
 - 접근자 프로퍼티 : 자체적으로 값을 갖지 않고 다른 데이터 프로퍼티의 값을 읽거나 저장할 때 호출되는 접근자 함수(getter/setter 함수)로 구성된 프로퍼티
 
-### 데이터 프로퍼티
+### <span className="text-h3"> 데이터 프로퍼티 </span>
 
 내부 슬롯인 프로퍼티 어트리뷰트는 getOwnPropertyDescriptor 메서드를 통해 얻어진 프로퍼티 디스크립터 객체를 통해 볼 수 있다. 자바스크립트 엔진이 프로퍼티를 생성할 때 기본값으로 프로퍼티들을 true로 정의한다. 이번엔 위에서 보았던 프로퍼티 디스크립터 객체 `{value: "kim", writable: true, enumerable: true, configurable: true}`의 프로퍼티가 뭔지 표를 통해 설명하고자 한다.
 
@@ -54,7 +54,7 @@ console.log(Object.getOwnPropertyDescriptor(person, 'name'))
 | **열거 가능 여부(Enumerable)**   | <ul><li>프로퍼티의 열거 가능 여부를 나타낸다</li> <li>`true`이면 `for...in` 문이나 `Object.keys` 에서 프로퍼티가 열거된다. </li></ul>                                                                                                                 |
 | **설정 가능 여부(Configurable)** | <ul><li>프로퍼티의 재정의 가능 여부를 나타낸다</li> <li>`true`이면 프로퍼티를 삭제하거나 어트리뷰트를 변경할 수 있다.</li></ul>                                                                                                                       |
 
-### 접근자 프로퍼티
+### <span className="text-h3"> 접근자 프로퍼티 </span>
 
 접근자 프로퍼티는 자체적으로 값을 갖지 않고 접근자 함수(getter/setter 함수)로 구성된 프로퍼티다. 이를 표를 통해 설명하고자 한다.
 
@@ -151,7 +151,7 @@ console.log(descriptor);
 
 이를 방지하기 위한 다양한 메서드가 존재하는데 각 메서드들은 객체의 변경을 금지하는 강도가 다르다.
 
-### 객체 확장 금지
+### <span className="text-h3"> 객체 확장 금지 </span>
 
 Object.preventExtensions 메서드는 객체의 확장을 금지한다. 이는 프로퍼티 추가 금지를 의미한다.
 
@@ -169,7 +169,7 @@ Object.defineProperty(person, 'age', { value: 20 })
 //TypeError: Cannot define property age, object is not extensible
 ```
 
-### 객체 밀봉
+### <span className="text-h3"> 객체 밀봉 </span>
 
 object.seal 메서드는 객체를 밀봉한다. 객체 밀봉이란 프로퍼티 추가 및 삭제와 프로퍼티 어트리뷰트 재정의 금지를 의미한다. 즉, 읽기와 쓰기만 가능하다.
 
@@ -195,7 +195,7 @@ Object.defineProperty(person, 'name', { configurable: true })
 //TypeError: cannot redefine property: name
 ```
 
-### 객체 동결
+### <span className="text-h3"> 객체 동결 </span>
 
 Object.freeze 메서드는 객체를 동결한다. 객체 동결이란 프로퍼티 추가 및 삭제와 프로퍼티 어트리뷰트 재정의 금지, 프로퍼티 값 갱신 금지를 의미한다. 즉, 읽기만 가능하다.
 
@@ -222,7 +222,7 @@ Object.defineProperty(person, 'name', { configurable: true })
 //TypeError: cannot redefine property: name
 ```
 
-### 불변 객체
+### <span className="text-h3"> 불변 객체 </span>
 
 위에서 살펴본 변경 방지 객체들은 직속 프로퍼티만 변경이 방지되고 중첩 객체는 영향을 안주는 얕은 변경 방지만 된다. 만약 중첩 객체까지 동결하려면 객체를 값으로 갖는 모든 프로퍼티에 대해 재귀적으로 Object.freeze 메서드를 호출해야 한다.
 
@@ -241,7 +241,7 @@ function deepFreeze(target) {
 
 ### Q. 내부 슬롯이나 내부 메서드는 직접적으로 접근 할 수 없고 간접적으로 접근한다는데 여기서 직접적인 접근과 간접적인 접근은 어떻게 접근하는걸 말하는건가요?
 
-A: 직접 접근은 .표기법 이나 대괄호 표기법을 이용해서 접근하는 방법을 말하고 간접적인 접근은 **proto**같이 특정 메서드나 함수를 이용해서 접근하는 것을 말합니다.
+A: 직접 접근은 .표기법 이나 대괄호 표기법을 이용해서 접근하는 방법을 말하고 간접적인 접근은 \_\_proto\_\_같이 특정 메서드나 함수를 이용해서 접근하는 것을 말합니다.
 
 ### Q. 프로퍼티 어트리뷰트란?
 
@@ -292,15 +292,15 @@ person.sayHello() // Hello Lee
 
 ## <span className="text-h2">생성자 함수</span>
 
-### 객체 리터럴에 의한 객체 생성 방식의 문제점
+### <span className="text-h3"> 객체 리터럴에 의한 객체 생성 방식의 문제점 </span>
 
 객체 리터럴에 의한 객체 생성 방식은 단 하나의 객체만 생성한다. 만약 동일한 프로퍼티를 갖는 객체를 여러 개 생성해야할 경우 매번 같은 프로퍼티를 기술해야 하기 때문에 비효율적이다.
 
-### 생성자 함수에 의한 객체 생성 방식의 장점
+### <span className="text-h3"> 생성자 함수에 의한 객체 생성 방식의 장점 </span>
 
 생성자 함수로 객체를 생성하는 방식은 마치 객체(인스턴스)를 생성하기 위한 템플릿처럼 생성자 함수를 사용하여 프로퍼티 구조가 동일한 객체 여러 개를 간편하게 생성할 수 있다.
 
-### 생성자 함수의 인스턴스 생성과정
+### <span className="text-h3"> 생성자 함수의 인스턴스 생성과정 </span>
 
 생성자 함수의 역할은 프로퍼티 구조가 동일한 인스턴스를 생성하기 위한 템플릿(클래스)으로서 동작하여 인스턴스를 생성하는 것과 생성된 인스턴스를 초기화(인스턴스 프로퍼티 추가 및 초기값 할당)하는 것이다.
 생성하는 방법은 new 연산자와 함께 생성자 함수를 호출하면 된다. 그러면 자바스크립트 엔진은 암묵적인 처리를 통해 인스턴스를 생성하고 반환한다. 다음은 그 과정을 설명했다.
@@ -316,7 +316,7 @@ person.sayHello() // Hello Lee
 
 참고로 만약 생성자 함수에 명시적으로 return을 써서 반환하게 된다면 원시 값의 경우엔 원시값은 무시되고 this가 반환되지만 객체를 반환하면 return문에 명시한 객체가 반환되니 생성자 함수 내부에서 return문은 반드시 생략하도록 하자
 
-### 내부 메서드 [[Call]] 과 [[constructor]]
+### <span className="text-h3"> 내부 메서드 [[Call]] 과 [[constructor]] </span>
 
 함수 선언문 또는 함수 표현식으로 정의한 함수는 일반적인 함수로서 호출할 수 있지만 생성자 함수로서도 호출 할 수 있다. 생성자 함수로서 호출한다는 건 new 연산자와 함께 호출하여 객체를 생성하는 것을 의미한다.
 함수는 객체 이지만 일반 객체와는 다르다. 일반 객체는 호출할 수 없지만 함수는 호출할 수 있다.
@@ -326,9 +326,9 @@ person.sayHello() // Hello Lee
 
 모든 함수 객체는 호출할 수 있는 객체를 뜻하는 **[[Call]]** 을 갖고 있고 이러한 객체를 callable 이라 한다.
 
-constructor는 생성자 함수로서 호출 할 수 있는 함수를 뜻하며 non-constructor는 객체를 생성자 함수로서 호출 할 수 없는 함수를 의미한다. non-constructor인 함수객체는 **[[construct]]**를 갖지 않는다.
+constructor는 생성자 함수로서 호출 할 수 있는 함수를 뜻하며 non-constructor는 객체를 생성자 함수로서 호출 할 수 없는 함수를 의미한다. non-constructor인 함수객체는 **[[construct]]** 를 갖지 않는다.
 
-### constructor와 non constructor의 구분
+### <span className="text-h3"> constructor와 non constructor의 구분 </span>
 
 그렇다면 자바스크립트 엔진은 어떻게 constructor와 non-constructor를 구분할까?
 바로 함수 정의를 평가하여 함수 객체를 생성할 때 함수 정의 방식에 따라 구분한다.
@@ -345,14 +345,14 @@ const obj = {
 new obj.x() // TypeError, obj.x is not a constructor
 ```
 
-### new 연산자
+### <span className="text-h3"> new 연산자 </span>
 
 new 연산자와 함께 함수를 호출하면 해당 함수는 생성자 함수로 동작한다.
-그렇다는건 **[[construct]]**를 갖지 않는 non-constructor는 new 연산자와 함께 호출하려고 하면 에러가 발생한다.
+그렇다는건 **[[construct]]** 를 갖지 않는 non-constructor는 new 연산자와 함께 호출하려고 하면 에러가 발생한다.
 반대로 new 연산자 없이 생성자 함수를 호출하면 일반 함수로 호출된다.
-그렇다는건 \**[[Construct]]*가 호출되는것이 아니라 *[Call]*이 호출된다는 것이다.
+그렇다는건 **[[Construct]]** 가 호출되는것이 아니라 **[Call]** 이 호출된다는 것이다.
 
-### new.target
+### <span className="text-h3"> new.target </span>
 
 생성자 함수가 new 없이 호출되는걸 방지하기 위해 ES6에서는 new.target을 지원한다.
 함수 내부에서 new.target을 확인해보면 생성자 함수로서 호출됐다면 함수 내부의 new.target은 함수 자신을 가리키고 new 연산자 없이 일반 함수로서 호출됐다면 undefined로 보인다. 이를 통해 new 연산자와 함께 생성자 함수로서 호출되었는지 확인할 수 있고 new 연산자가 없다면 재귀호출을 통해 new를 붙여 줄 수 있다.
@@ -387,3 +387,29 @@ function Circle(radius) {
 //이를 통해 연결 여부를 확인한다.
 const circle = Circle(5)
 ```
+
+## <span className="text-qa">Q&A</span>
+
+### Q. 생성자 함수 내부의 this가 생성자 함수가 생성할 인스턴스를 가리키는 이유?
+
+A: 런타임 이전 평가단계에서 인스턴스를 생성할때 암묵적으로 빈 객체가 생성되고 이 인스턴스가 식별자 역할을 하는 this에 바인딩(식별자와 값을 연결하는 과정) 하게 되는데 이때 가리키게 됨
+
+### Q. 생성자 함수 내부에서 return문을 생략해야 하는 이유는?
+
+A: 생성자 함수의 기본동작을 유지 하기 위해서 입니다. 생성자 함수의 내부에서 모든 처리가 끝나면 완성된 인스턴스가 바인딩된 this를 암묵적으로 반환되는데 만약 this가 아닌 다른 객체를 명시적으로 반환하면 this가 반환되지 못하고 명시한 객체가 반환되고 이는 코드의 일관성이 떨어지기 때문에 return문을 반드시 생략해야 합니다.
+
+### Q. [[Call]] 이 호출되는 경우와 [[Construct]]가 호출되는 경우는 어떤 차이로 발생하나요?
+
+A: [[Call]]은 일반함수, [[Construct]]는 new 연산자와 함께 생성자 함수로서 호출될때 발생합니다.
+
+### Q. constructor와 non-constructor를 자바스트립트 엔진이 어떻게 구분하나요?
+
+A:어떻게 정의되어 있느냐로 구분하는데 함수 선언문, 함수표현식, 클래스는 constructor로, 메서드, 화살표함수는 non-constructor로 구분합니다.
+
+### Q. 함수가 생성자 함수로 동작하려면 어떻게 해야 하나요?
+
+A: new 연산자와 함께 호출하면 됩니다.
+
+### Q. 생성자 함수가 new 연산자 없이 호출되는것을 방지하기 위한 방법은?
+
+new.target으로 new 연산자를 작성 여부를 확인하여 undefined라면 재귀호출하여 붙여줍니다 또 다른 방법으로는 생성자 함수와 this를 instanceof 로 확인해서 this가 전역객체를 가리키고 있다면 new 연산자를 붙이도록 합니다.
