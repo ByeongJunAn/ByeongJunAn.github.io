@@ -61,8 +61,25 @@ const computedFields: ComputedFields = {
       let match
       const parentStack: { id: string; level: number }[] = []
 
+      // HTML 엔티티를 디코딩하는 함수
+      const decodeHtmlEntities = (text) => {
+        const entities = {
+          '&amp;': '&',
+          '&lt;': '<',
+          '&gt;': '>',
+          '&quot;': '"',
+          '&#39;': "'",
+          '&nbsp;': ' ',
+          '&lowbar;': '_',
+          // 필요한 다른 엔티티들을 추가하세요
+        }
+        return text.replace(/&[a-zA-Z0-9#]+;/g, (match) => entities[match] || match)
+      }
+
       while ((match = regex.exec(doc.body.raw)) !== null) {
-        const cleanTitle = match[2].replace(/<[^>]*>/g, '')
+        let cleanTitle = match[2].replace(/<[^>]*>/g, '')
+        cleanTitle = decodeHtmlEntities(cleanTitle) // HTML 엔티티 디코딩
+
         let id = cleanTitle
           .toLowerCase()
           .replace(/[^\w\s가-힣-]/g, '')

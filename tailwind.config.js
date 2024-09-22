@@ -27,9 +27,26 @@ module.exports = {
       colors: {
         primary: colors.pink,
         gray: colors.gray,
-        h1: '#FF9999',
-        h2: '#A3E4A3',
-        qa: '#4682B4',
+        h1: {
+          light: '#3b82f6', // 밝은 파란색
+          DEFAULT: '#1e40af', // 네이비 블루
+          dark: '#1e3a8a', // 어두운 네이비 블루
+        },
+        h2: {
+          light: '#34d399', // 밝은 녹색
+          DEFAULT: '#059669', // 진한 녹색
+          dark: '#047857', // 어두운 녹색
+        },
+        h3: {
+          light: '#facc15', // 밝은 노란색
+          DEFAULT: '#eab308', // 골드
+          dark: '#ca8a04', // 어두운 골드
+        },
+        qa: {
+          light: '#5f6a8a', // 밝은 네이비
+          DEFAULT: '#000080', // 네이비 블루
+          dark: '#00004d', // 어두운 네이비
+        },
       },
       typography: ({ theme }) => ({
         DEFAULT: {
