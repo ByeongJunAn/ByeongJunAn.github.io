@@ -1,0 +1,389 @@
+---
+title: '모던 자바스크립트 Deep Dive 복습 6'
+date: '2024-09-16'
+lastmod: '2024-09-17'
+tags: ['review', 'javascript']
+draft: false
+summary: |
+  (1) 프로퍼티 어트리뷰트
+  (2) 생성자 함수에 의한 객체 생성
+---
+
+# <span className="text-h1">프로퍼티 어트리뷰트</span>
+
+## <span className="text-h2">내부 슬롯과 내부 메서드</span>
+
+내부 슬롯과 내부 메서드는 자바스크립트 엔진의 내부 로직이며 ECMAScript 사양에 등장하는 이중 대괄호([[...]])로 감싼 이름을 말한다.
+이 내부 슬롯과 내부 메서드에 직접 접근이나 호출할 수는 없고 일부 슬롯과 메서드에 한하여 간접적으로 접근할 수 있는 수단을 제공한다.
+예를 들어 모든 객체는 **[[Prototype]]** 이라는 내부 슬롯을 갖는데 직접 접근은 불가능 하지만 `__proto__` 를 통해 간접적으로 접근 할 수 있다.
+
+## <span className="text-h2">프로퍼티 어트리뷰트와 프로퍼티 디스크립터 객체</span>
+
+자바스크립트 엔진이 프로퍼티를 생성할 때 내부 슬롯에 프로퍼티의 상태를 나타내는 값을 자동으로 정의한다.
+그 상태의 종류로는 프로퍼티의 값(value), 값의 갱신 가능 여부(writable), 열거 가능 여부(enumerable), 재정의 가능 여부(configurable)가 있다.
+
+이들은 내부 슬롯 **[[Value]]**, **[[Writable]]**, **[[Enumerable]]**, **[[Configurable]]** 이므로 직접 접근 할 수는 없고 Object.getOwnPropertyDescriptor라는 메서드를 사용하여 간접적으로 확인할 수 있다.
+
+object.getOwnPropertyDescriptor 메서드는 프로퍼티 어트리뷰트 정보를 제공하는 프로퍼티 디스크립터(PropertyDescriptor)객체를 반환한다.
+
+```javascript
+const person = {
+  name: 'kim',
+}
+
+//프로퍼티 어트리뷰트 정보를 제공하는 프로퍼티 디스크립터 객체를 반환한다.
+console.log(Object.getOwnPropertyDescriptor(person, 'name'))
+//{value: "kim", writable: true, enumerable: true, configurable: true}
+```
+
+## <span className="text-h2">데이터 프로퍼티와 접근자 프로퍼티</span>
+
+프로퍼티는 데이터 프로퍼티와 접근자 프로퍼티로 구분할 수 있다.
+
+- 데이터 프로퍼티 : 키와 값으로 구성된 일반적인 프로퍼티
+- 접근자 프로퍼티 : 자체적으로 값을 갖지 않고 다른 데이터 프로퍼티의 값을 읽거나 저장할 때 호출되는 접근자 함수(getter/setter 함수)로 구성된 프로퍼티
+
+### 데이터 프로퍼티
+
+내부 슬롯인 프로퍼티 어트리뷰트는 getOwnPropertyDescriptor 메서드를 통해 얻어진 프로퍼티 디스크립터 객체를 통해 볼 수 있다. 자바스크립트 엔진이 프로퍼티를 생성할 때 기본값으로 프로퍼티들을 true로 정의한다. 이번엔 위에서 보았던 프로퍼티 디스크립터 객체 `{value: "kim", writable: true, enumerable: true, configurable: true}`의 프로퍼티가 뭔지 표를 통해 설명하고자 한다.
+
+| 프로퍼티 이름                    | 설명                                                                                                                                                                                                                                                  |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **값 (Value)**                   | <ul><li>프로퍼티 키를 통해 프로퍼티 값에 접근하면 반환되는 값</li> <li> 프로퍼티 키를 통해 프로퍼티 값을 변경하면 내부슬롯 [[Value]] 에 값을 재할당한다. 이때 프로퍼티가 없으면 프로퍼티를 동적 생성하고 생성된 [[Value]] 에 값을 저장한다.</li></ul> |
+| **쓰기 가능 여부(Writable)**     | <ul><li>값의 변경 가능 여부를 나타낸다.</li> <li>`true`이면 프로퍼티의 값을 변경할 수 있다.</li></ul>                                                                                                                                                 |
+| **열거 가능 여부(Enumerable)**   | <ul><li>프로퍼티의 열거 가능 여부를 나타낸다</li> <li>`true`이면 `for...in` 문이나 `Object.keys` 에서 프로퍼티가 열거된다. </li></ul>                                                                                                                 |
+| **설정 가능 여부(Configurable)** | <ul><li>프로퍼티의 재정의 가능 여부를 나타낸다</li> <li>`true`이면 프로퍼티를 삭제하거나 어트리뷰트를 변경할 수 있다.</li></ul>                                                                                                                       |
+
+### 접근자 프로퍼티
+
+접근자 프로퍼티는 자체적으로 값을 갖지 않고 접근자 함수(getter/setter 함수)로 구성된 프로퍼티다. 이를 표를 통해 설명하고자 한다.
+
+| 프로퍼티 이름                    | 설명                                                                                                                                                                                                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Get**                          | <ul><li>접근자 프로퍼티를 통해 데이터 프로퍼티의 값을 읽을 때 호출되는 접근자 함수다.</li> <li>접근자 프로퍼티 키로 프로퍼티 값에 접근하면 getter(프로퍼티 어트리뷰트 **[[Get]]** 의 값) 함수가 호출되고 그 결과가 프로퍼티 값으로 반환된다.</li></ul> |
+| **Set**                          | <ul><li>접근자 프로퍼티를 통해 데이터 프로퍼티의 값을 저장할 때 호출되는 접근자 함수</li> <li>접근자 프로퍼티 키로 프로퍼티 값을 저장하면 setter(프로퍼티 어트리뷰트 **[[Set]]** 의 값) 함수가 호출되고 그 결과가 프로퍼티 값으로 저장된다.</li></ul>  |
+| **열거 가능 여부(Enumerable)**   | 데이터 프로퍼티의 **[[Enumerable]]** 과 같다.                                                                                                                                                                                                          |
+| **설정 가능 여부(Configurable)** | 데이터 프로퍼티의 **[[Configurable]]** 과 같다.                                                                                                                                                                                                        |
+
+```javascript
+const person = {
+  firstName: 'hong',
+  lastName: 'gildong',
+}
+//fullName은 접근자 함수로 구성된 접근자 프로퍼티다.
+//getter 함수
+get fullName() {
+  return `${this.firstName} ${this.lastName}`;
+},
+
+//setter 함수
+set fullName(name) {
+  [this.firstName, this.lastName] = name.split(' ');
+}
+
+//데이터 프로퍼티를 통한 프로퍼티 값의 참조
+console.log(person.firstName + ' ' + person.lastName); //gildong hong
+
+//접근자 프로퍼티를 통한 프로퍼티 값의 저장
+//접근자 프로퍼티 fullName에 값을 저장하면 setter 함수가 호출된다.
+person.firstName = 'hanna kim';
+console.log(person); // {firstName: 'hanna', lastName: 'kim'};
+
+//접근자 프로퍼티를 통한 프로퍼티 값의 참조
+//접근자 프로퍼티 fullName에 접근하면 getter 함수가 호출된다.
+console.log(person.fullName); //hanna kim
+
+//fullName은 접근자 프로퍼티다.
+descriptor = Object.getOwnPropertyDescriptor(person, 'fullName');
+console.log(descriptor);
+//{get: f, set: f, enumerable: true, configurable: true}
+```
+
+## <span className="text-h2">프로퍼티 정의</span>
+
+프로퍼티 정의란 새로운 프로퍼티를 추가하면서 프로퍼티 어트리뷰트를 명시적으로 정의하거나 기존 프로퍼티 어트리뷰트를 재정의 하는 것을 말한다.
+Object.defineProperty 메서드를 사용하면 정의할 수 있다.
+
+```javascript
+const person = [];
+
+//데이터 프로퍼티 정의
+Object.defineProperty(person, 'firstName', {
+  value: 'John',
+  writable: true,
+  enumerable: true,
+  configurable: true
+});
+
+Object.defineProperty(person, 'lastName', {
+  value: 'Lee'
+});
+
+let descriptor = Object.getOwnPropertyDescriptor(person, 'firstName');
+console.log(descriptor);
+// {value: 'John', writable: true, enumerable: true, configurable: true}
+
+//접근자 프로퍼티 정의
+Object.defineProperty(person, 'fullName', {
+  //getter 함수
+  get(){
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  //setter 함수
+  set(name){
+    [this.firstName, this.lastName] = name.split(' ');
+  },
+  enumerable: true,
+  configurable: true
+});
+
+descriptor = object.getOwnPropertyDescriptor(person, 'firstName');
+console.log(descriptor);
+//{get: f, set: f, enumerable:true, configurable:true}
+```
+
+만약 어트리뷰트를 정의할때 프로퍼티의 일부를 생략하면 기본값으로 value, get, set 프로퍼티는 undefined로 적용되고 writable, enumerable, configurable은 false로 적용된다.
+
+## <span className="text-h2">객체 변경 방지</span>
+
+객체는 변경 가능한 값이므로 재할당 없이 직접 변경 할 수 있다. 즉, 프로퍼티를 추가하거나 삭제할 수 있고, 프로퍼티 값을 갱신할 수 있으며, Object.defineProperty 메서드를 사용하여 프로퍼티 어트리뷰트를 재정의 할 수도 있다.
+
+이를 방지하기 위한 다양한 메서드가 존재하는데 각 메서드들은 객체의 변경을 금지하는 강도가 다르다.
+
+### 객체 확장 금지
+
+Object.preventExtensions 메서드는 객체의 확장을 금지한다. 이는 프로퍼티 추가 금지를 의미한다.
+
+```javascript
+const person = { name: 'John' }
+
+//person 객체의 확장을 금지하여 프로퍼티 추가를 금지한다.
+Object.preventExtensions(person)
+
+person.age = 20 //무시, strict mode에서는 에러
+console.log(person)
+
+//프로퍼티 정의에 의한 추가도 금지된다.
+Object.defineProperty(person, 'age', { value: 20 })
+//TypeError: Cannot define property age, object is not extensible
+```
+
+### 객체 밀봉
+
+object.seal 메서드는 객체를 밀봉한다. 객체 밀봉이란 프로퍼티 추가 및 삭제와 프로퍼티 어트리뷰트 재정의 금지를 의미한다. 즉, 읽기와 쓰기만 가능하다.
+
+```javascript
+const person = { name: 'John' }
+
+Object.seal(person)
+
+//프로퍼티 추가 금지
+person.age = 20 //무시, strict mode에서는 에러
+console.log(person) // {name: 'John'}
+
+//프로퍼티 삭제 금지
+delete person.name // 무시, strict mode에서는 에러
+console.log(person) // {name: 'John'}
+
+//프로퍼티 값 갱신은 가능
+person.name = 'Kim'
+console.log(person) // {name: "Kim"}
+
+//프로퍼티 어트리뷰트 재정의 금지
+Object.defineProperty(person, 'name', { configurable: true })
+//TypeError: cannot redefine property: name
+```
+
+### 객체 동결
+
+Object.freeze 메서드는 객체를 동결한다. 객체 동결이란 프로퍼티 추가 및 삭제와 프로퍼티 어트리뷰트 재정의 금지, 프로퍼티 값 갱신 금지를 의미한다. 즉, 읽기만 가능하다.
+
+```javascript
+const person = { name: 'John' }
+
+Object.freeze(person)
+
+//프로퍼티 추가 금지
+person.age = 20 //무시, strict mode에서는 에러
+console.log(person) // {name: 'John'}
+
+//프로퍼티 삭제 금지
+delete person.name // 무시, strict mode에서는 에러
+console.log(person) // {name: 'John'}
+
+//프로퍼티 값 갱신 금지
+person.name = 'Kim'
+console.log(person) // 무시, strict mode에서는 에러
+console.log(person) // {name: 'John'}
+
+//프로퍼티 어트리뷰트 재정의 금지
+Object.defineProperty(person, 'name', { configurable: true })
+//TypeError: cannot redefine property: name
+```
+
+### 불변 객체
+
+위에서 살펴본 변경 방지 객체들은 직속 프로퍼티만 변경이 방지되고 중첩 객체는 영향을 안주는 얕은 변경 방지만 된다. 만약 중첩 객체까지 동결하려면 객체를 값으로 갖는 모든 프로퍼티에 대해 재귀적으로 Object.freeze 메서드를 호출해야 한다.
+
+```javascript
+function deepFreeze(target) {
+  if (target && typeof target === 'object' && !Object.isFrozen(target)) {
+    Object.freeze(target)
+
+    Object.keys(target).forEach((key) => deepFreeze(target[key]))
+  }
+  return target
+}
+```
+
+## <span className="text-qa">Q&A</span>
+
+### Q. 내부 슬롯이나 내부 메서드는 직접적으로 접근 할 수 없고 간접적으로 접근한다는데 여기서 직접적인 접근과 간접적인 접근은 어떻게 접근하는걸 말하는건가요?
+
+A: 직접 접근은 .표기법 이나 대괄호 표기법을 이용해서 접근하는 방법을 말하고 간접적인 접근은 **proto**같이 특정 메서드나 함수를 이용해서 접근하는 것을 말합니다.
+
+### Q. 프로퍼티 어트리뷰트란?
+
+A: 어떤 객체의 프로퍼티에 대한 상태 정보를 나타내는 내부 슬롯인데 데이터 프로퍼티와 접근자 프로퍼티로 유형을 나눌 수 있습니다
+
+### Q. 프로퍼티 정의란?
+
+A: 새로운 프로퍼티를 추가하면서 프로퍼티 어트리뷰트를 명시적으로 정의 또는 재정의 하는 것을 말한다.
+
+### Q. Object.defineProperty 메서드로 정의할때
+
+writable, enumerable, configurable을 정의하지 않으면 기본값이 뭐로 나오나요?
+
+A: false
+
+### Q: 객체 변경 방지 방법은 뭐가 있고 객체의 중첩된 모든 프로퍼티까지 변경을 방지 할 수 있나요?
+
+A: 객체 확장 금지 : preventExtensions (프로퍼티 추가만 금지)
+객체 밀몽 : seal (프로퍼티 추가 제거와 어트리뷰트 재정의 금지)
+객체 동결 : freeze (프로퍼티 추가 제거, 값 갱신, 어트리뷰트 재정의 금지 즉, 읽기만 가능)
+중첩된 모든 프로퍼티 까지 변경 방지하려면 재귀적으로 freeze()를 사용하면 됩니다.
+
+# <span className="text-h1">생성자 함수에 의한 객체 생성</span>
+
+생성자 함수(constructor)란 new 연산자와 함께 호출하여 객체(인스턴스)를 생성하는 함수를 말한다.
+생성자 함수에 의해 생성된 객체를 인스턴스(instance)라 한다.
+생성자 함수를 사용하여 객체를 생성하는 방식을 살펴보고 객체 리터럴과 생성자 함수를 사용하여 객체를 생성하는 방식을 비교하여 장단점을 살펴보고자 한다.
+
+## <span className="text-h2">Object 생성자 함수</span>
+
+new 연산자와 함께 Object 생성자 함수를 호출하면 빈 객체를 생성하여 반환한다. 빈 객체를 생성한 이후 프로퍼티 또는 메서드를 추가하여 객체를 완성할 수 있다.
+
+```javascript
+// Object 생성자 함수를 사용하여 빈 객체 생성
+const person = new Object()
+
+//프로퍼티 추가
+person.name = 'Lee'
+person.sayHello = function () {
+  console.log('Hello ' + this.name)
+}
+
+console.log(person) //{name:"Lee", sayHello: f}
+person.sayHello() // Hello Lee
+```
+
+이외에도 String, Number, Boolean, Function, Array, Date, RegExp, Promise 등의 빌트인 생성자 함수도 있다.
+
+## <span className="text-h2">생성자 함수</span>
+
+### 객체 리터럴에 의한 객체 생성 방식의 문제점
+
+객체 리터럴에 의한 객체 생성 방식은 단 하나의 객체만 생성한다. 만약 동일한 프로퍼티를 갖는 객체를 여러 개 생성해야할 경우 매번 같은 프로퍼티를 기술해야 하기 때문에 비효율적이다.
+
+### 생성자 함수에 의한 객체 생성 방식의 장점
+
+생성자 함수로 객체를 생성하는 방식은 마치 객체(인스턴스)를 생성하기 위한 템플릿처럼 생성자 함수를 사용하여 프로퍼티 구조가 동일한 객체 여러 개를 간편하게 생성할 수 있다.
+
+### 생성자 함수의 인스턴스 생성과정
+
+생성자 함수의 역할은 프로퍼티 구조가 동일한 인스턴스를 생성하기 위한 템플릿(클래스)으로서 동작하여 인스턴스를 생성하는 것과 생성된 인스턴스를 초기화(인스턴스 프로퍼티 추가 및 초기값 할당)하는 것이다.
+생성하는 방법은 new 연산자와 함께 생성자 함수를 호출하면 된다. 그러면 자바스크립트 엔진은 암묵적인 처리를 통해 인스턴스를 생성하고 반환한다. 다음은 그 과정을 설명했다.
+
+1. 인스턴스 생성과 this 바인딩
+   런타임 이전, 암묵적으로 빈 객체(인스턴스)가 생성된다. 그리고 이 인스턴스는 this에 바인딩 된다(식별자 역할을 하는 this와 생성된 인스턴스가 연결된다고 보면 된다)
+
+2. 인스턴스 초기화
+   this에 바인딩되어 있는 인스턴스에 프로퍼티나 메서드를 추가하고 생성자 함수가 인수로 전달받은 초기값을 인스턴스 프로퍼티에 할당하여 초기화하거나 고정값을 할당한다.
+
+3. 인스턴스 반환
+   생성자 함수 내부에서 모든 처리가 끝나면 완성된 인스턴스가 바인딩된 this를 암묵적으로 반환한다.
+
+참고로 만약 생성자 함수에 명시적으로 return을 써서 반환하게 된다면 원시 값의 경우엔 원시값은 무시되고 this가 반환되지만 객체를 반환하면 return문에 명시한 객체가 반환되니 생성자 함수 내부에서 return문은 반드시 생략하도록 하자
+
+### 내부 메서드 [[Call]] 과 [[constructor]]
+
+함수 선언문 또는 함수 표현식으로 정의한 함수는 일반적인 함수로서 호출할 수 있지만 생성자 함수로서도 호출 할 수 있다. 생성자 함수로서 호출한다는 건 new 연산자와 함께 호출하여 객체를 생성하는 것을 의미한다.
+함수는 객체 이지만 일반 객체와는 다르다. 일반 객체는 호출할 수 없지만 함수는 호출할 수 있다.
+함수 객체는 일반객체가 갖고 있는 내부 슬롯과 내부 메서드를 다 갖고 있고 거기에 **[[Environment]]**, **[[FormalParameters]]** 등의 내부슬롯과 **[[Call]]**, **[[Construct]]** 같은 내부 메서드를 추가로 갖고 있다.
+
+함수가 일반 함수로서 호출되면 함수 객체의 내부 메서드 [[Call]]이 호출되고 new 연산자와 함께 생성자 함수로서 호출되면 내부 메서드 **[[Construct]]** 가 호출된다.
+
+모든 함수 객체는 호출할 수 있는 객체를 뜻하는 **[[Call]]** 을 갖고 있고 이러한 객체를 callable 이라 한다.
+
+constructor는 생성자 함수로서 호출 할 수 있는 함수를 뜻하며 non-constructor는 객체를 생성자 함수로서 호출 할 수 없는 함수를 의미한다. non-constructor인 함수객체는 **[[construct]]**를 갖지 않는다.
+
+### constructor와 non constructor의 구분
+
+그렇다면 자바스크립트 엔진은 어떻게 constructor와 non-constructor를 구분할까?
+바로 함수 정의를 평가하여 함수 객체를 생성할 때 함수 정의 방식에 따라 구분한다.
+
+- constructor : 함수 선언문, 함수 표현식, 클래스(클래스도 함수다)
+- non-constructor : 메서드(ES6 메서드 축약표현), 화살표 함수
+
+```javascript
+const obj = {
+  //ES6 메서드 축약표현만 메서드로 인정한다.
+  x() {},
+}
+
+new obj.x() // TypeError, obj.x is not a constructor
+```
+
+### new 연산자
+
+new 연산자와 함께 함수를 호출하면 해당 함수는 생성자 함수로 동작한다.
+그렇다는건 **[[construct]]**를 갖지 않는 non-constructor는 new 연산자와 함께 호출하려고 하면 에러가 발생한다.
+반대로 new 연산자 없이 생성자 함수를 호출하면 일반 함수로 호출된다.
+그렇다는건 \**[[Construct]]*가 호출되는것이 아니라 *[Call]*이 호출된다는 것이다.
+
+### new.target
+
+생성자 함수가 new 없이 호출되는걸 방지하기 위해 ES6에서는 new.target을 지원한다.
+함수 내부에서 new.target을 확인해보면 생성자 함수로서 호출됐다면 함수 내부의 new.target은 함수 자신을 가리키고 new 연산자 없이 일반 함수로서 호출됐다면 undefined로 보인다. 이를 통해 new 연산자와 함께 생성자 함수로서 호출되었는지 확인할 수 있고 new 연산자가 없다면 재귀호출을 통해 new를 붙여 줄 수 있다.
+
+```javascript
+function Circle(radius) {
+  // 함수를 new 연산자와 함께 호출하지 않았다면 undefined로나온다.
+  if (!new.target) {
+    //new 연산자와 함께 생성자 함수를 재귀 호출하여 생성된 인스턴스를 반환한다.
+    return new Circle(radius)
+  }
+
+  //...내부 로직
+}
+// new 연산자 없이 호출해도 new.target을 통해 생성자 함수로서 호출된다.
+const circle = Circle(5)
+```
+
+new.target은 ES6에서 지원하므로 그 이하 버전을 사용하는 곳에서는 사용하지 못한다. 그럴 경우엔 스코프 세이프 생성자 패턴을 사용할 수 있는데
+생성자 함수가 new 연산자와 함께 호출되면 함수의 선두에서 빈 객체를 생성하고 this에 바인딩 한다.
+이때 생성자 함수와 this가 연결되는데 instanceof를 사용하여 this가 생성자 함수와 연결 되어있는지, 전역객체에 연결되어 있는지를 확인하여 new 연산자를 썼는지 안썼는지를 확인할 수 있다.
+
+```javascript
+function Circle(radius) {
+  if (!(this instanceof Circle)) {
+    return new Circle(radius)
+  }
+  //... 내부 로직
+}
+
+// new 연산자 없이 호출하면 this가 프로토타입에 의해 전역객체에 연결되는데
+//이를 통해 연결 여부를 확인한다.
+const circle = Circle(5)
+```
